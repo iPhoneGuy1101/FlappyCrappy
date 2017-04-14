@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FlappyCrappy</title><meta name='mobile-web-app-capable' content='yes'><meta name='apple-mobile-web-app-capable' content='yes'><link rel='apple-touch-icon' href='favicon.ico'><link rel='icon' href='favicon.ico'></link>
+	</head>
+	<body>
+		<canvas id='canvas' class='canvas' width=480 height=480 style='border: double 4px;background:#09F'></canvas>
+		<script>
+			var c = document.getElementsByTagName('canvas')[0];
+			var ctx = c.getContext("2d");
+			var points = 0;
+			var turdburd = new Image()
+			turdburd.src = 'favicon.ico';
+			function Pipe(x){
+				this.ySize = 64;
+				this.y = Math.random()*c.height*0.6+(c.height*0.15);
+				this.x = x||c.width;
+				this.passed = !true;
+				this.show = function(){
+					ctx.fillStyle='green';
+					ctx.fillRect(this.x-32,0,64,this.y-this.ySize);
+					ctx.fillRect(this.x-32,this.y+this.ySize,64,c.height);
+					var sameX = BURD.x <= this.x+32 && BURD.x >= this.x-32;
+					var sameY = BURD.y <= this.y+this.ySize && BURD.y >= this.y-this.ySize;
+					if(sameX && sameY){
+						if(!this.passed) {
+							points++;
+							this.passed = true;
+						}
+					} else if(sameX){
+						BURD.living = false;
+					}
+					if(BURD.living&&playing) this.x-=0.98;
+					if(this.x < -this.ySize){
+						this.y = Math.random()*c.height*0.6+(c.height*0.15);
+						this.x = c.width+this.ySize;
+						this.passed = false;
+					}
+				}
+			}
+			function TurdBird(){
+				this.y = c.height/2;
+				this.x = c.width/3;
+				this.velY = -0;
+				this.living = !false;
+				this.lastShow = new Date().getTime();
+				this.show = function(){
+					ctx.save();
+					ctx.translate(this.x, this.y)
+					if(!this.living) {
+						if(this.y<c.height*0.845){
+							this.y+=this.velY
+						}
+						ctx.rotate(Math.PI/2);
+					}else{
+						this.y += this.velY
+						this.lastShow = new Date().getTime();
+					}
+					ctx.drawImage(turdburd, -32, -32, 64, 64);
+					ctx.restore();
+					if(this.y>c.height*0.85) this.living = false;
+				}
+			}
+			var playing = false;
+			var BURD = new TurdBird();
+			var PIPE = [new Pipe(), new Pipe(c.width*1.5+64)];
+			function Draw(){
+				ctx.clearRect(0,0,c.width,c.height);
+				ctx.fillStyle='green';
+				ctx.fillRect(0,c.height*0.845,c.width,c.height*0.155);
+				now = new Date().getTime();
+				for(var i=0; i<PIPE.length; i++){
+					PIPE[i].show();
+				}
+				BURD.show();
+				if(playing) BURD.velY+=0.03;
+				ctx.fillStyle='white';
+				ctx.font="30px Arial";
+				ctx.fillText("Points: "+points,16,64);
+				setTimeout(Draw, 1);
+			}
+			c.onclick = function(){
+				if(!playing) playing=true;
+				BURD.velY=-1.8;
+			}
+			Draw();
+		</script>
+	</body>
+</html>
